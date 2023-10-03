@@ -95,3 +95,40 @@ health = health[["iddate","year","idgeo","isoalpha3","source","sex","age","indic
 # Export dataset
 health.to_csv(f"{path}/indicators_health.csv", index = False)
 #------------------------------------------------------------------------------
+
+'''
+# Temporary dataframe with labels
+#------------------------------------------------------------------------------
+ghed    = who_ghed[["var_code","var_name"]]
+ghed    = ghed.rename(columns = {"var_code":"indicator","var_name":"label_en"})
+gho     = who_gho[["GHO","display"]]
+gho     = gho.rename(columns = {"GHO":"indicator","display":"label_en"})
+labels_ = pd.concat([ghed, gho])
+labels_ = labels_.drop_duplicates()
+labels_ = labels_.reset_index(drop = True)
+labels_.indicator = labels_.indicator.str.lower()
+
+# Create dictionary 
+health_dict = health.copy()
+health_dict = health_dict.drop(columns = ["iddate","year","idgeo","isoalpha3","sex","age","value"])
+health_dict = health_dict.drop_duplicates()
+health_dict = health_dict.reset_index(drop = True)
+health_dict["collection"] = "International Organizations"
+health_dict["resource"]   = "International Organizations Indicators"
+health_dict["theme_en"]   = "health"
+health_dict["theme_es"]   = "salud"
+health_dict               = health_dict.merge(labels_, on = "indicator", how = "left")
+health_dict["label_en"]   = np.where(health_dict.indicator == "lexp","Life expectancy at birth"        , health_dict.label_en)
+health_dict["label_en"]   = np.where(health_dict.indicator == "hale","Healthy Life Expectancy at birth", health_dict.label_en)
+health_dict["label_en"]   = np.where(health_dict.indicator == "HAQ" ,"Health Access and Quality index" , health_dict.label_en)
+health_dict                   = health_dict[["collection","resource","source","theme_en","theme_es","indicator","label_en"]]
+health_dict["label_es"]       = ""
+health_dict["description_en"] = ""
+health_dict["description_es"] = ""
+health_dict["value_type"]     = ""
+health_dict["categories"]     = ""
+
+# Export dictionary
+# TODO: Add label_es and description_en/_es manually 
+health_dict.to_csv(f"{path}/dictionary_health.csv", index = False)
+'''
