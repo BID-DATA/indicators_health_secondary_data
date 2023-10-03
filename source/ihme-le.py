@@ -1,7 +1,7 @@
 '''
 Program   : Preprocessing IHME data 
             Life expectancy and healthy life expectancy
-Source    : IHME GBd Results
+Source    : IHME GBD Results
             https://vizhub.healthdata.org/gbd-results/
 Author    : Laura Goyeneche 
             lauragoy@iadb.org 
