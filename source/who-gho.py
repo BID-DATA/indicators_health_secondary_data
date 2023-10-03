@@ -123,6 +123,7 @@ who_gho["YEAR_MAX"] = who_gho.groupby(vars_).YEAR.transform("max")
 who_gho["LATEST"]   = (who_gho.YEAR == who_gho.YEAR_MAX).astype(int)
 
 # Export data 
+#------------------------------------------------------------------------------
 path  = "International Organizations/World Health Organization (WHO)/"
 path += "Global Health Observatory (GHO)"
 who_gho.to_csv(f"s3://{sclbucket}/{path}/who-gho-api.csv", index = False)
