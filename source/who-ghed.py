@@ -22,30 +22,46 @@ Notes     : Download data manually
 
 # Libraries
 #------------------------------------------------------------------------------
+import io
+import os
+import boto3
+import dotenv
 import numpy as np
 import pandas as pd
 
-# Working directory
-# TODO: Change to DataLake connection
+# Working environments
 #------------------------------------------------------------------------------
-path  = "/Users/lauragoyeneche/Google Drive/My Drive/02-Work/10-IDB Consultant/1-Social Protection & Health"
-path += "/0-Health data/health-public"
+dotenv.load_dotenv("/home/ec2-user/SageMaker/.env")
+sclbucket   = os.environ.get("sclbucket")
+scldatalake = os.environ.get("scldatalake")
+
+# Resources and buckets
+#------------------------------------------------------------------------------
+s3        = boto3.client('s3')
+s3_       = boto3.resource("s3")
+s3_bucket = s3_.Bucket(sclbucket)
 
 # Country keys 
 #------------------------------------------------------------------------------
+# Path 
+path = "Geospatial Basemaps/Cartographic Boundary Files/keys"
+
 # IADB 26-LAC countries
-iadb       = pd.read_csv(f"{path[:-14]}/iadb-keys.csv")
+iadb       = pd.read_csv(f"s3://{sclbucket}/{path}/iadb-keys.csv")
 codes_iadb = iadb.isoalpha3.unique().tolist()
 
 # OECD countries
-oecd       = pd.read_csv(f"{path[:-14]}/oecd-keys.csv") 
+oecd       = pd.read_csv(f"s3://{sclbucket}/{path}/oecd-keys.csv") 
 codes_oecd = oecd.isoalpha3.unique().tolist()
 
 # Import data and dictionary
-# TODO: Change to DataLake connection
 #------------------------------------------------------------------------------
-who_ghed      = pd.read_excel(f"{path}/WHO/GHE/GHED_data_raw.xlsx", sheet_name = "Data")
-who_ghed_dict = pd.read_excel(f"{path}/WHO/GHE/GHED_data_raw.xlsx", sheet_name = "Codebook")
+path          = "International Organizations/World Health Organization (WHO)/Globoal Health Expenditure Database (GHED)/GHED_data_raw.xlsx"
+obj           = s3.get_object(Bucket = sclbucket, Key = path)
+excel_data    = obj['Body'].read()
+excel_file    = io.BytesIO(excel_data)
+who_ghed      = pd.read_excel(excel_file, engine = "openpyxl", sheet_name = "Data")
+who_ghed_dict = pd.read_excel(excel_file, engine = "openpyxl", sheet_name = "Codebook")
 who_ghed_dict = who_ghed_dict.rename(columns = {"variable code":"var_code","variable name":"var_name"})
 
 # Preprocessing
@@ -128,5 +144,8 @@ who_ghed.var_name = np.where(who_ghed.var_code == "pri_che"  , "Private as % CHE
 who_ghed.var_name = np.where(who_ghed.var_code == "che_gdp"  , "CHE as % GDP"       , who_ghed.var_name)
 
 # Export data
-who_ghed.to_csv(f"{path}/WHO/GHE/GHED_data_processed.csv", index = False)
+path  = "International Organizations/World Health Organization (WHO)/"
+path += "Globoal Health Expenditure Database (GHED)"
+
+who_ghed.to_csv(f"s3://{sclbucket}/{path}/GHED_data_processed.csv", index = False)
 #------------------------------------------------------------------------------
