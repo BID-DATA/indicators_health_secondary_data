@@ -14,26 +14,54 @@ Notes     : Edit dictionary manually
 
 # Libraries
 #------------------------------------------------------------------------------
+import io
+import os
+import boto3
+import dotenv
 import numpy as np
 import pandas as pd
 
-# Working directory
-# TODO: Change to DataLake connection
+# Working environments
 #------------------------------------------------------------------------------
-path  = "/Users/lauragoyeneche/Google Drive/My Drive/02-Work/10-IDB Consultant/1-Social Protection & Health"
-path += "/0-Health data/health-public"
+dotenv.load_dotenv("/home/ec2-user/SageMaker/.env")
+sclbucket   = os.environ.get("sclbucket")
+scldatalake = os.environ.get("scldatalake")
 
-# IADB 26-LAC countries keys 
+# Resources and buckets
 #------------------------------------------------------------------------------
-iadb       = pd.read_csv(f"{path[:-14]}/iadb-keys.csv")
+s3        = boto3.client('s3')
+s3_       = boto3.resource("s3")
+s3_bucket = s3_.Bucket(sclbucket)
+
+# IADB 26-LAC  keys 
+#------------------------------------------------------------------------------
+# Path 
+path       = "Geospatial Basemaps/Cartographic Boundary Files/keys"
+iadb       = pd.read_csv(f"s3://{sclbucket}/{path}/iadb-keys.csv")
 codes_iadb = iadb.isoalpha3.unique().tolist()
+
 
 # Import data 
 #------------------------------------------------------------------------------
-who_ghed = pd.read_csv(f"{path}/WHO/GHE/GHED_data_processed.csv")
-ihme_le  = pd.read_csv(f"{path}/IHME/gbd/expectancy/ihme-gbd-le-hale.csv")
-ihme_haq = pd.read_csv(f"{path}/IHME/haq/raw/haq.csv")
-who_gho  = pd.read_csv(f"{path}/WHO/GHO/who-gho-api.csv")
+# WHO GHED
+path  = "International Organizations/World Health Organization (WHO)/"
+path += "Globoal Health Expenditure Database (GHED)"
+who_ghed = pd.read_csv(f"s3://{sclbucket}/{path}/GHED_data_processed.csv")
+
+# IHME HAQ
+path  = "International Organizations/Institute for Health Metrics and Evaluation (IHME)"
+path +="/Healthcare Access and Quality (HAQ) index/processed"
+ihme_haq = pd.read_csv(f"s3://{sclbucket}/{path}/haq.csv")
+
+# IHME LE
+path  = "International Organizations/Institute for Health Metrics and Evaluation (IHME)/"
+path += "Global Burden of Disease (GBD)/processed"
+ihme_le = pd.read_csv(f"s3://{sclbucket}/{path}/ihme-gbd-le-hale.csv")
+
+# WHO GHO 
+path    = "International Organizations/World Health Organization (WHO)/"
+path   += "Global Health Observatory (GHO)"
+who_gho = pd.read_csv(f"s3://{sclbucket}/{path}/who-gho-api.csv")
 
 # Preprocessing
 #------------------------------------------------------------------------------
@@ -93,7 +121,8 @@ health = pd.concat([who_ghed_, ihme_le, ihme_haq, who_gho_])
 health = health[["iddate","year","idgeo","isoalpha3","source","sex","age","indicator","value"]]
 
 # Export dataset
-health.to_csv(f"{path}/indicators_health.csv", index = False)
+path = "International Organizations/International Organizations Indicators/health"
+health.to_csv(pd.read_csv(f"s3://{sclbucket}/{path}/indicators_health.csv", index = False)
 #------------------------------------------------------------------------------
 
 '''
