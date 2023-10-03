@@ -23,37 +23,51 @@ Notes     : Download data manually
 
 # Libraries
 #------------------------------------------------------------------------------
+import os
+import boto3
+import dotenv
 import numpy as np
 import pandas as pd
 
-# Working directory
-# TODO: Change to DataLake connection
+# Working environments
 #------------------------------------------------------------------------------
-path  = "/Users/lauragoyeneche/Google Drive/My Drive/02-Work/10-IDB Consultant/1-Social Protection & Health"
-path += "/0-Health data/health-public"
+dotenv.load_dotenv("/home/ec2-user/SageMaker/.env")
+sclbucket   = os.environ.get("sclbucket")
+scldatalake = os.environ.get("scldatalake")
+
+# Resources and buckets
+#------------------------------------------------------------------------------
+s3        = boto3.client('s3')
+s3_       = boto3.resource("s3")
+s3_bucket = s3_.Bucket(sclbucket)
 
 # Country keys 
 #------------------------------------------------------------------------------
+# Path 
+path = "Geospatial Basemaps/Cartographic Boundary Files/keys"
+
 # IADB 26-LAC countries
-iadb       = pd.read_csv(f"{path[:-14]}/iadb-keys.csv")
+iadb       = pd.read_csv(f"s3://{sclbucket}/{path}/iadb-keys.csv")
 codes_iadb = iadb.isoalpha3.unique().tolist()
 
 # OECD countries
-oecd       = pd.read_csv(f"{path[:-14]}/oecd-keys.csv") 
+oecd       = pd.read_csv(f"s3://{sclbucket}/{path}/oecd-keys.csv") 
 codes_oecd = oecd.isoalpha3.unique().tolist()
 
 # World countries
-world = pd.read_csv(f"{path[:-14]}/world-keys.csv") 
+world = pd.read_csv(f"s3://{sclbucket}/{path}/world-keys.csv") 
 world = world.rename(columns = {"isoalpha3":"code","country_name_en":"location_name"})
 world = world.drop(columns = "income_group")
 
 # Import data and dictionary
-# TODO: Change to DataLake connection
 #------------------------------------------------------------------------------
-ihme_le   = pd.concat([pd.read_csv(f"{path}/IHME/gbd/expectancy/le/ihme-gbd-le-{i}.csv")     for i in [1,2,3]])
-ihme_hale = pd.concat([pd.read_csv(f"{path}/IHME/gbd/expectancy/hale/ihme-gbd-hale-{i}.csv") for i in [1,2,3]])
+path      = "International Organizations/Institute for Health Metrics and Evaluation (IHME)/"
+path     += "Global Burden of Disease (GBD)"
+
+ihme_le   = pd.concat([pd.read_csv(f"s3://{sclbucket}/{path}/raw/ihme-gbd-le-{i}.csv")     for i in [1,2,3]])
+ihme_hale = pd.concat([pd.read_csv(f"s3://{sclbucket}/{path}/raw/ihme-gbd-hale-{i}.csv") for i in [1,2,3]])
 ihme_le   = pd.concat([ihme_le, ihme_hale])
-ihme_dict = pd.read_csv(f"{path}/IHME/gbd/_codebook/ihme-location-2019.csv")
+ihme_dict = pd.read_csv(f"s3://{sclbucket}/{path}/codebook/ihme-location-2019.csv")
 
 # Preprocessing
 #------------------------------------------------------------------------------
@@ -101,7 +115,7 @@ ihme_le = pd.concat([ihme_le] + group_)
 ihme_le = ihme_le.drop(columns = ["IADB","OECD","Global"])
 
 # Export data 
-ihme_le.to_csv(f"{path}/IHME/gbd/expectancy/ihme-gbd-le-hale.csv", index = False)
+ihme_le.to_csv(f"s3://{sclbucket}/{path}/processed/ihme-gbd-le-hale.csv", index = False)
 #------------------------------------------------------------------------------
 
 
