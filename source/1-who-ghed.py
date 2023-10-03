@@ -107,7 +107,7 @@ who_ghed = who_ghed.drop(columns = ["IADB","OECD","Global"])
 who_ghed["gghed_che"] = who_ghed.gghed_usd * 100 / (who_ghed.gghed_usd + who_ghed.hf3_usd + who_ghed.hf2_usd)
 who_ghed["oop_che"]   = who_ghed.hf3_usd   * 100 / (who_ghed.gghed_usd + who_ghed.hf3_usd + who_ghed.hf2_usd)
 who_ghed["pri_che"]   = who_ghed.hf2_usd   * 100 / (who_ghed.gghed_usd + who_ghed.hf3_usd + who_ghed.hf2_usd)
-who_ghed["che_gdp"]   = who_ghed.che_usd * 100 / who_ghed.gdp_usd
+who_ghed["che_gdp"]   = who_ghed.che_usd   * 100 / who_ghed.gdp_usd
 
 # Reshape dataset
 id_vars_ = ["country","code","year"]
