@@ -23,14 +23,24 @@ Notes     : This dataset can be updated manually
 
 # Libraries
 #------------------------------------------------------------------------------
+import os
+import boto3
+import dotenv
+import numpy as np
 import pandas as pd
 from ghoclient import GHOSession, index
 
-# Working directory
-# TODO: Change to DataLake connection
+# Working environments
 #------------------------------------------------------------------------------
-path  = "/Users/lauragoyeneche/Google Drive/My Drive/02-Work/10-IDB Consultant/1-Social Protection & Health"
-path += "/0-Health data/health-public"
+dotenv.load_dotenv("/home/ec2-user/SageMaker/.env")
+sclbucket   = os.environ.get("sclbucket")
+scldatalake = os.environ.get("scldatalake")
+
+# Resources and buckets
+#------------------------------------------------------------------------------
+s3        = boto3.client('s3')
+s3_       = boto3.resource("s3")
+s3_bucket = s3_.Bucket(sclbucket)
 
 # Connect to API
 #------------------------------------------------------------------------------
@@ -113,5 +123,7 @@ who_gho["YEAR_MAX"] = who_gho.groupby(vars_).YEAR.transform("max")
 who_gho["LATEST"]   = (who_gho.YEAR == who_gho.YEAR_MAX).astype(int)
 
 # Export data 
-who_gho.to_csv(f"{path}/WHO/GHO/who-gho-api.csv", index = False)
+path  = "International Organizations/World Health Organization (WHO)/"
+path += "Global Health Observatory (GHO)"
+who_gho.to_csv(f"s3://{sclbucket}/{path}/who-gho-api.csv", index = False)
 #------------------------------------------------------------------------------
