@@ -102,7 +102,6 @@ ihme_le = ihme_le.drop(columns = ["IADB","OECD","Global"])
 
 # Export data 
 ihme_le.to_csv(f"{path}/IHME/gbd/expectancy/ihme-gbd-le-hale.csv", index = False)
-
 #------------------------------------------------------------------------------
 
 
