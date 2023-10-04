@@ -63,7 +63,7 @@ world = world.drop(columns = "income_group")
 # Import data and dictionary
 #------------------------------------------------------------------------------
 path     = "International Organizations/Institute for Health Metrics and Evaluation (IHME)"
-path    +="/Healthcare Access and Quality (HAQ) index/raw"
+path    += "/Healthcare Access and Quality (HAQ) index/raw"
 ihme_haq = pd.read_csv(f"s3://{sclbucket}/{path}/haq_1990_2016_scaled.csv")
 
 # Preprocessing
@@ -86,6 +86,6 @@ ihme_haq["Global"] = 1
 
 # Export data 
 path     = "International Organizations/Institute for Health Metrics and Evaluation (IHME)"
-path    +="/Healthcare Access and Quality (HAQ) index/processed"
+path    += "/Healthcare Access and Quality (HAQ) index/processed"
 ihme_haq.to_csv(f"s3://{sclbucket}/{path}/haq.csv", index = False)
 #------------------------------------------------------------------------------
