@@ -95,13 +95,12 @@ for group in ["IADB","OECD","Global"]:
     temp_ = temp_.drop(columns = ["IADB","OECD","Global"])
 
     # Create new variables
-    temp_["pop"]              = temp_["pop"] * 1000
-    temp_["gghed_usd2020_pc"] = temp_["pop"] / temp_.gghed_usd
-    temp_["hf3_usd2020_pc"]   = temp_["pop"] / temp_.hf3_usd
-    temp_["hf2_usd2020_pc"]   = temp_["pop"] / temp_.hf2_usd
-    temp_["gghed_ppp2020_pc"] = temp_["pop"] / temp_.gghed_ppp2020
-    temp_["hf3_ppp2020_pc"]   = temp_["pop"] / temp_.hf3_ppp2020
-    temp_["hf2_ppp2020_pc"]   = temp_["pop"] / temp_.hf2_ppp2020
+    temp_["gghed_usd2020_pc"] = temp_.gghed_usd       / (temp_["pop"] / 1000)
+    temp_["hf3_usd2020_pc"]   = temp_.hf3_usd         / (temp_["pop"] / 1000)
+    temp_["hf2_usd2020_pc"]   = temp_.hf2_usd         / (temp_["pop"] / 1000)
+    temp_["gghed_ppp2020_pc"] = temp_.gghed_ppp2020   / (temp_["pop"] / 1000)
+    temp_["hf3_ppp2020_pc"]   = temp_.hf3_ppp2020     / (temp_["pop"] / 1000)
+    temp_["hf2_ppp2020_pc"]   = temp_.hf2_ppp2020     / (temp_["pop"] / 1000)
     temp_["gghed_gdp"]        = temp_.gghed_usd * 100 / temp_.gdp_usd
     temp_["hf3_gdp"]          = temp_.gghed_usd * 100 / temp_.gdp_usd
     temp_["hf2_gdp"]          = temp_.gghed_usd * 100 / temp_.gdp_usd
