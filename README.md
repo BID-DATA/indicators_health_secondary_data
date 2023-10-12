@@ -10,7 +10,7 @@
 ## Description 
 This repository contains a collection of code for preprocessing secondary data for health in Latin America and the Caribben (LAC). The repository aims to facilite data analysis and exploration by providing modules (.py) for preprocessing various datasets related to the health indicators. This repository's **main objetive** is to create a centralized and continuosly updated resource for preprocessing and analyzing health indicators in the region. By fostering collaboration and knowledge sharing, the repository aims to support research, analysts, and policymakers in conducting in-depth geospatial analysis and generating valuable insights for the region. 
 
-This repository includes scriptos and instructions for obtaining the following datasets: 
+This repository includes scripts and instructions for obtaining the following datasets: 
 
 1. Life expectancy and healthy life expectancy from [IHME GBD Results](https://vizhub.healthdata.org/gbd-results/)
 
